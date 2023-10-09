@@ -61,24 +61,24 @@ test("getList check endpoint name", async () => {
     await manager.getList("invalid");
 });
 
-test("getList check url", async () => {
-    expect(await manager.getList("listable")).toBe("https://example.com/api/listable");
-    expect(await manager.getList("")).toBe("https://example.com/api/");
-    expect(await manager.getList("/")).toBe("https://example.com/api/");
-    expect(await manager.getList("/path/")).toBe("https://example.com/api/path/");
+test("getListUrl", async () => {
+    expect(manager.getListUrl("listable")).toBe("https://example.com/api/listable");
+    expect(manager.getListUrl("")).toBe("https://example.com/api/");
+    expect(manager.getListUrl("/")).toBe("https://example.com/api/");
+    expect(manager.getListUrl("/path/")).toBe("https://example.com/api/path/");
 });
 
-test("getList with filters", async () => {
+test("getListUrl with filters", async () => {
     // @ts-expect-error
-    await manager.getList("listable", { a: "4" });
+    manager.getListUrl("listable", { a: "4" });
     // @ts-expect-error
-    await manager.getList("listable", { b: 4 });
+    manager.getListUrl("listable", { b: 4 });
     // @ts-expect-error
-    await manager.getList("listable", { c: 4 });
+    manager.getListUrl("listable", { c: 4 });
 
-    expect(await manager.getList("listable", { a: 42 })).toBe("https://example.com/api/listable?a=42");
-    expect(await manager.getList("listable", { b: "42" })).toBe("https://example.com/api/listable?b=42");
-    expect(await manager.getList("listable", { b: "b", a: 69 })).toBe("https://example.com/api/listable?b=b&a=69");
+    expect(manager.getListUrl("listable", { a: 42 })).toBe("https://example.com/api/listable?a=42");
+    expect(manager.getListUrl("listable", { b: "42" })).toBe("https://example.com/api/listable?b=42");
+    expect(manager.getListUrl("listable", { b: "b", a: 69 })).toBe("https://example.com/api/listable?b=b&a=69");
 });
 
 test("getList with pagination", async () => {
@@ -104,17 +104,17 @@ test("getOne check endpoint name", async () => {
     await manager.getOne("invalid", 1);
 });
 
-test("getOne check url", async () => {
-    expect(await manager.getOne("detailable", 1)).toBe("https://example.com/api/detailable/1");
-    expect(await manager.getOne("", 1)).toBe("https://example.com/api/1");
-    expect(await manager.getOne("/", 1)).toBe("https://example.com/api/1");
-    expect(await manager.getOne("/path/", 1)).toBe("https://example.com/api/path/1");
+test("getOneUrl", async () => {
+    expect(manager.getOneUrl("detailable", 1)).toBe("https://example.com/api/detailable/1");
+    expect(manager.getOneUrl("", 1)).toBe("https://example.com/api/1");
+    expect(manager.getOneUrl("/", 1)).toBe("https://example.com/api/1");
+    expect(manager.getOneUrl("/path/", 1)).toBe("https://example.com/api/path/1");
 });
 
-test("getOne with custom parameter type", async () => {
-    expect(await manager.getOne("custom_param_type", 42)).toBe("https://example.com/api/custom_param_type/42");
-    expect(await manager.getOne("custom_param_type", "A")).toBe("https://example.com/api/custom_param_type/A");
-    expect(await manager.getOne("custom_param_type", "B")).toBe("https://example.com/api/custom_param_type/B");
+test("getOneUrl with custom parameter type", async () => {
+    expect(manager.getOneUrl("custom_param_type", 42)).toBe("https://example.com/api/custom_param_type/42");
+    expect(manager.getOneUrl("custom_param_type", "A")).toBe("https://example.com/api/custom_param_type/A");
+    expect(manager.getOneUrl("custom_param_type", "B")).toBe("https://example.com/api/custom_param_type/B");
 
     // @ts-expect-error
     await manager.getOne("custom_param_type", 1);
@@ -122,8 +122,8 @@ test("getOne with custom parameter type", async () => {
     await manager.getOne("custom_param_type", "a");
 });
 
-test("getOne with custom parameter path", async () => {
-    expect(await manager.getOne("custom/$PARAM/path/", 42)).toBe("https://example.com/api/custom/42/path/");
+test("getOneUrl with custom parameter path", async () => {
+    expect(manager.getOneUrl("custom/$PARAM/path/", 42)).toBe("https://example.com/api/custom/42/path/");
 });
 
 test("ending backslash", async () => {
@@ -132,12 +132,12 @@ test("ending backslash", async () => {
         endingBackslash: true,
     });
 
-    expect(await m.getList("listable")).toBe("https://example.com/api/listable/");
-    expect(await m.getList("listable", { a: 42 })).toBe("https://example.com/api/listable/?a=42");
-    expect(await m.getOne("detailable", 1)).toBe("https://example.com/api/detailable/1/");
-    expect(await m.getOne("", 1)).toBe("https://example.com/api/1/");
-    expect(await m.getOne("/", 1)).toBe("https://example.com/api/1/");
-    expect(await m.getOne("/path/", 1)).toBe("https://example.com/api/path/1/");
+    expect(m.getListUrl("listable")).toBe("https://example.com/api/listable/");
+    expect(m.getListUrl("listable", { a: 42 })).toBe("https://example.com/api/listable/?a=42");
+    expect(m.getOneUrl("detailable", 1)).toBe("https://example.com/api/detailable/1/");
+    expect(m.getOneUrl("", 1)).toBe("https://example.com/api/1/");
+    expect(m.getOneUrl("/", 1)).toBe("https://example.com/api/1/");
+    expect(m.getOneUrl("/path/", 1)).toBe("https://example.com/api/path/1/");
 });
 
 test("extra query parameters", async () => {
@@ -149,9 +149,9 @@ test("extra query parameters", async () => {
         ],
     });
 
-    expect(await m.getList("listable")).toBe("https://example.com/api/listable?format=json&key=value");
-    expect(await m.getList("listable", { a: 42 })).toBe("https://example.com/api/listable?format=json&key=value&a=42");
-    expect(await m.getOne("detailable", 1)).toBe("https://example.com/api/detailable/1?format=json&key=value");
+    expect(m.getListUrl("listable")).toBe("https://example.com/api/listable?format=json&key=value");
+    expect(m.getListUrl("listable", { a: 42 })).toBe("https://example.com/api/listable?format=json&key=value&a=42");
+    expect(m.getOneUrl("detailable", 1)).toBe("https://example.com/api/detailable/1?format=json&key=value");
 });
 
 test("path mapping", async () => {
@@ -169,8 +169,8 @@ test("path mapping", async () => {
         },
     });
 
-    expect(await m.getList("listable")).toBe("https://example.com/api/");
-    expect(await m.getOne("detailable", 1)).toBe("https://example.com/api/my/path/1");
+    expect(m.getListUrl("listable")).toBe("https://example.com/api/");
+    expect(m.getOneUrl("detailable", 1)).toBe("https://example.com/api/my/path/1");
 });
 
 test("custom param tag", async () => {
@@ -182,6 +182,6 @@ test("custom param tag", async () => {
         customParamTag: "$TEST",
     });
 
-    expect(await m.getList("/")).toBe("https://example.com/api/my/$TEST/test/$TEST/again");
-    expect(await m.getOne("/", 1)).toBe("https://example.com/api/my/1/test/$TEST/again");
+    expect(m.getListUrl("/")).toBe("https://example.com/api/my/$TEST/test/$TEST/again");
+    expect(m.getOneUrl("/", 1)).toBe("https://example.com/api/my/1/test/$TEST/again");
 });

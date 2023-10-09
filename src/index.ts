@@ -110,7 +110,7 @@ export class APIManager<API extends { [key: string]: IEndpoint | any }> {
             .catch(e => Promise.reject(e));
     }
 
-    protected getUrl<N extends keyof API>(name: N): string {
+    protected getEndpointUrl<N extends keyof API>(name: N): string {
         let url = this.apiBaseUrl;
 
         const path = this.pathMapping[name] || String(name);
@@ -126,20 +126,15 @@ export class APIManager<API extends { [key: string]: IEndpoint | any }> {
         return url;
     }
 
-    public getList<N extends ListableEndpoints<API>, FILTERS extends FilterType<API[N]>>(
+    public getListUrl<N extends ListableEndpoints<API>, FILTERS extends FilterType<API[N]>>(
         name: N,
         filters?: FILTERS
-    ): Promise<ListType<API[N]>> {
-        let url = this.getUrl(name);
-        url = this.finalizeUrl(url, filters);
-        return this.fetch(url).then((json: any) =>
-            // eslint-disable-next-line
-            this.paginated && this.paginated.includes(name) && this.paginationKey in json ? json[this.paginationKey] : json
-        ) as any;
+    ): string {
+        return this.finalizeUrl(this.getEndpointUrl(name), filters);
     }
 
-    public getOne<N extends DetailableEndpoints<API>>(name: N, id: ParameterType<API[N]>): Promise<DetailedType<API[N]>> {
-        let url = this.getUrl(name);
+    public getOneUrl<N extends DetailableEndpoints<API>>(name: N, id: ParameterType<API[N]>): string {
+        let url = this.getEndpointUrl(name);
         if (url.includes(this.customParamTag)) {
             // eslint-disable-next-line
             url = url.replace(this.customParamTag, id.toString());
@@ -147,7 +142,22 @@ export class APIManager<API extends { [key: string]: IEndpoint | any }> {
             if (!url.endsWith("/")) url += "/";
             url += id;
         }
-        url = this.finalizeUrl(url);
+        return this.finalizeUrl(url);
+    }
+
+    public getList<N extends ListableEndpoints<API>, FILTERS extends FilterType<API[N]>>(
+        name: N,
+        filters?: FILTERS
+    ): Promise<ListType<API[N]>> {
+        const url = this.getListUrl(name, filters);
+        return this.fetch(url).then((json: any) =>
+            // eslint-disable-next-line
+            this.paginated && this.paginated.includes(name) && this.paginationKey in json ? json[this.paginationKey] : json
+        ) as any;
+    }
+
+    public getOne<N extends DetailableEndpoints<API>>(name: N, id: ParameterType<API[N]>): Promise<DetailedType<API[N]>> {
+        const url = this.getOneUrl(name, id);
         return this.fetch(url) as any;
     }
 }
