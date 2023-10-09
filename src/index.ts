@@ -126,10 +126,7 @@ export class APIManager<API extends { [key: string]: IEndpoint | any }> {
         return url;
     }
 
-    public getListUrl<N extends ListableEndpoints<API>, FILTERS extends FilterType<API[N]>>(
-        name: N,
-        filters?: FILTERS
-    ): string {
+    public getListUrl<N extends ListableEndpoints<API>, FILTERS extends FilterType<API[N]>>(name: N, filters?: FILTERS): string {
         return this.finalizeUrl(this.getEndpointUrl(name), filters);
     }
 
